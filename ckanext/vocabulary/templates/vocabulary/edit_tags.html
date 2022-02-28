@@ -1,0 +1,19 @@
+{% import 'macros/form.html' as form %}
+
+{% extends "page.html" %}
+
+{% block breadcrumb_content %}
+<li class="active">{% link_for _('Vocabularies'), named_route='vocabulary.index' %}</li>
+<li class="active">{% link_for vocab_name, named_route='vocabulary.read', id=vocab_name %}</li>
+<li class="active">{% link_for _('Delete Tag'), named_route='vocabulary.delete_tags', vocab_id=vocab_name, id = tag.id %}</li>
+{% endblock %}
+
+
+{% block primary_content_inner %}
+  <form  method="post" data-module="basic-form">
+    <p>Will you like to delete Tag: <b>{{ tag.name }}</b> from Vocabulary: <b>{{ vocab_name }}</b></p>
+    <div class="form-actions">
+      <button type="submit" class="btn btn-danger" name="delete">{{ _('delete') }}</button>
+    </div>
+  </form>
+{% endblock %}

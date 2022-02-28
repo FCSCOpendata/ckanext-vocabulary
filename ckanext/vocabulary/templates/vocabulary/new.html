@@ -1,0 +1,26 @@
+{% import 'macros/form.html' as form %}
+
+{% extends "page.html" %}
+
+{% block breadcrumb_content %}
+  <li class="active">{% link_for _('Vocabularies'), named_route='vocabulary.index' %}</li>
+  <li class="active">{% link_for _('Create Vocabulary'), named_route='vocabulary.new' %}</li>
+{% endblock %}
+
+
+{% block primary_content_inner %}
+  <form class="dataset-form" method="post" data-module="basic-form">
+    <div class="form-group">
+      {{ form.input('vocabulary', label =_('Vocabulary'))}}
+    </div>
+    {% block package_basic_fields_tags %}
+      {% set tag_attrs = {'data-module': 'autocomplete', 'data-module-tags': '', 'data-module-source': '/api/2/util/tag/autocomplete?incomplete=?'} %}
+      {{ form.input('tag_string', id='field-tags', label=_('Tags'), placeholder=_('eg. economy, mental health, government'), classes=['control-full'], attrs=tag_attrs) }}
+    {% endblock %}
+    <div class="form-actions">
+      <button type="submit" class="btn btn-primary" name="save">{{ _('save') }}</button>
+    </div>
+  </form>
+{% endblock %}
+
+

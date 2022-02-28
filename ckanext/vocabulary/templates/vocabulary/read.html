@@ -1,0 +1,38 @@
+{% extends "page.html" %}
+
+
+{% block wrapper_class %}-custom{% endblock %}
+
+{% block breadcrumb_content %}
+  <li class="active">{% link_for _('Vocabularies'), named_route='vocabulary.index' %}</li>
+  <li class="active">{% link_for vocab.name, named_route='vocabulary.read', id=vocab.id %}</li>
+{% endblock %}
+
+{% block primary_content_inner %}
+  <h1>{{vocab.name}}</h1>
+  <header class="page-header collection-header">
+    <span><b>{{ _('Tags') }}</b></span>
+    <span style="float: right;">
+      {% if h.check_access('vocabulary_create') %}
+          {% link_for _('Manage'), controller='vocabulary', action='edit', id=vocab.id, class_='btn btn-default', icon='wrench' %}
+      {% endif %}
+    </span>
+  </header>
+  <hr>
+  <div>
+    {% if h.check_access('tag_create') %}
+      {% link_for _('Add Tags'), named_route='vocabulary.new_tags', id=vocab.id, class_='btn btn-primary', icon='plus-square' %}
+    {% endif %}
+  </div>
+  <br >
+  <div>
+    {% if vocab.tags %}
+      <p><b>{{ vocab.tags | length }}</b> Tag(s) found </p>
+      {% for tag in vocab.tags %}
+        <span class="btn btn-default mr-4"><a href="{{ h.url_for('vocabulary.delete_tags', vocab_id=vocab.id, id=tag.id)}}">{{ tag.name }}</a></span>
+      {% endfor %}
+    {% else %}
+      <i>{{ _('no tags found')}}</i>
+    {% endif %}
+  </div>
+{% endblock %}
