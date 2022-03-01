@@ -12,7 +12,10 @@
 {% block primary_content_inner %}
   <form  method="post" data-module="basic-form">
     <div class="form-group">
-      {{ form.input('vocabulary', label =_('Vocabulary'), value=vocab.name)}}
+      {{ form.input('vocabulary', label =_('Vocabulary EN'), value=vocab.name)}}
+    </div>
+    <div class="form-group">
+      {{ form.input('vocabulary-ar', label =_('Vocabulary AR'), value=vocab.name_translated.ar)}}
     </div>
     
     <div class="form-actions">

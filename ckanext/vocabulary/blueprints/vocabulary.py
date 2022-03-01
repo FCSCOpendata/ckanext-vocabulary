@@ -41,13 +41,27 @@ def new():
     if request.method == 'POST':
         params = clean_dict(
                 dict_fns.unflatten(tuplize_dict(parse_params(request.form))))
+        log.debug("params")
+        log.debug(params)
         data_dict = {}
         data_dict['name'] = params['vocabulary']
-        if params['tag_string']:
-            tags = params["tag_string"].split(",")
-            tags = [{'name': tag.strip()} for tag in tags]
-            data_dict['tags'] = tags
+        data_dict["name_translated-en"] = params['vocabulary']
+        data_dict["name_translated-ar"] = params['vocabulary-ar']
 
+        ar_tags = params['ar']
+        en_tags = params['en']
+
+        if ar_tags and en_tags:
+            ztags = zip(en_tags, ar_tags)
+            tags = []
+            for tag in ztags:
+                tag_dict = {}
+                tag_dict['name'] = tag[0]
+                tag_dict['name_translated-en'] = tag[0]
+                tag_dict['name_translated-ar'] = tag[1]
+                tags.append(tag_dict)
+
+        data_dict['tags'] = tags
         create_vocab = get_action('vocabulary_create')(context, data_dict)
         return h.redirect_to(h.url_for('vocabulary_read', id=params['vocabulary']))
 
@@ -62,6 +76,8 @@ def read(id):
 
     try:
         vocab = get_action("vocabulary_show")(context, {'id': id})
+        log.debug("vocabulary_show")
+        log.debug(vocab)
     except NotFound:
         abort(404, _('Vocabulary not found'))
     
