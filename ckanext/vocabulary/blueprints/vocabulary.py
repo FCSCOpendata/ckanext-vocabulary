@@ -133,7 +133,7 @@ def delete(id):
     context = {'model': model, 'session': model.Session,
                 'user': c.user, 'auth_user_obj': c.userobj}
     if not c.userobj.sysadmin:
-        base.abort(403, _(u'Unauthorized to create new tags'))
+        base.abort(403, _(u'Unauthorized to delete vocabulary and tags'))
     
     if request.method == "POST":
         params = clean_dict(
