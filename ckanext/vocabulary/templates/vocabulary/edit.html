@@ -16,7 +16,12 @@
     </div>
     
     <div class="form-actions">
-      <button class="btn btn-danger pull-left" name="delete" value="Delete"> {{ _('Delete') }} </button>
+      {% block delete_button %}
+        {% if h.check_access('vocabulary_delete', {'id': vocab.id})  %}
+          {% set locale = h.dump_json({'content': _('Are you sure you want to delete this Vocabulary and all its Tags?')}) %}
+          <a class="btn btn-danger pull-left" href="{{h.url_for('vocabulary.delete', id=vocab.id)}}" data-module="confirm-action" data-module-i18n="{{ locale }}">{% block delete_button_text %}{{ _('Delete') }}{% endblock %}</a>
+        {% endif %}
+      {% endblock %}
       <button type="submit" class="btn btn-primary" name="save">{{ _('save') }}</button>
     </div>
   </form>

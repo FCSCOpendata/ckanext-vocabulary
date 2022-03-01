@@ -78,12 +78,8 @@ def edit(id):
         params = clean_dict(
                 dict_fns.unflatten(tuplize_dict(parse_params(request.form))))
         
-        if "delete" in params:
-            get_action('vocabulary_delete')(context, {'id': id})
-            return h.redirect_to(h.url_for('vocabulary.index'))
-        else:
-            get_action('vocabulary_update')(context, {'id': id, "name": params['vocabulary']})
-            return h.redirect_to(h.url_for('vocabulary_read', id=id))
+        get_action('vocabulary_update')(context, {'id': id, "name": params['vocabulary']})
+        return h.redirect_to(h.url_for('vocabulary_read', id=id))
 
     vocab = get_action('vocabulary_show')(context, {'id': id})
     return render('vocabulary/edit.html', {"vocab": vocab})
@@ -93,7 +89,7 @@ def new_tags(id):
     context = {'model': model, 'session': model.Session,
                 'user': c.user, 'auth_user_obj': c.userobj}
     if not c.userobj.sysadmin:
-        base.abort(403, _(u'Unauthorized to edit vocabulary'))
+        base.abort(403, _(u'Unauthorized to create new tags'))
     
     if request.method == "POST":
         params = clean_dict(
@@ -115,7 +111,7 @@ def delete_tags(vocab_id, id):
     context = {'model': model, 'session': model.Session,
                 'user': c.user, 'auth_user_obj': c.userobj}
     if not c.userobj.sysadmin:
-        base.abort(403, _(u'Unauthorized to edit vocabulary'))
+        base.abort(403, _(u'Unauthorized to delete tags'))
 
     if request.method == "POST":
         params = clean_dict(
@@ -133,9 +129,31 @@ def delete_tags(vocab_id, id):
     return render('vocabulary/edit_tags.html', {"tag": tag, 'vocab_name': vocab_name})
 
 
+def delete(id):
+    context = {'model': model, 'session': model.Session,
+                'user': c.user, 'auth_user_obj': c.userobj}
+    if not c.userobj.sysadmin:
+        base.abort(403, _(u'Unauthorized to create new tags'))
+    
+    if request.method == "POST":
+        params = clean_dict(
+                dict_fns.unflatten(tuplize_dict(parse_params(request.form))))
+        
+        tags = get_action('vocabulary_show')(context, {'id': id})['tags']
+
+        for tag in tags:
+            get_action('tag_delete')(context, tag)
+        get_action('vocabulary_delete')(context, {'id': id})
+        return h.redirect_to(h.url_for('vocabulary.index'))
+
+    vocab = get_action('vocabulary_show')(context, {'id': id})
+    return render('vocabulary/confirm_delete.html', {"vocab": vocab})
+
+
 vocab_blueprint.add_url_rule(u'/', methods=[u'GET'],view_func=index)
 vocab_blueprint.add_url_rule(u'/new', methods=[u'GET', u'POST'],view_func=new)
 vocab_blueprint.add_url_rule(u'/<id>/read', methods=[u'GET'],view_func=read)
 vocab_blueprint.add_url_rule(u'/<id>/edit', methods=[u'GET', u'POST'],view_func=edit)
 vocab_blueprint.add_url_rule(u'/<id>/tags/new', methods=[u'GET', u'POST'],view_func=new_tags)
 vocab_blueprint.add_url_rule(u'/<vocab_id>/tag/<id>/delete', methods=[u'GET', u'POST'],view_func=delete_tags)
+vocab_blueprint.add_url_rule(u'/<id>/delete', methods=[u'GET', u'POST'],view_func=delete)
