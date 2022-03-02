@@ -41,8 +41,6 @@ def new():
     if request.method == 'POST':
         params = clean_dict(
                 dict_fns.unflatten(tuplize_dict(parse_params(request.form))))
-        log.debug("params")
-        log.debug(params)
         data_dict = {}
         data_dict['name'] = params['vocabulary']
         data_dict["name_translated-en"] = params['vocabulary']
@@ -76,8 +74,6 @@ def read(id):
 
     try:
         vocab = get_action("vocabulary_show")(context, {'id': id})
-        log.debug("vocabulary_show")
-        log.debug(vocab)
     except NotFound:
         abort(404, _('Vocabulary not found'))
     
