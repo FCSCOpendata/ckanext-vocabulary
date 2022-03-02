@@ -4,7 +4,7 @@
 {% block wrapper_class %}-custom{% endblock %}
 
 {% block breadcrumb_content %}
-  <li class="active">{% link_for _('Vocabularies'), named_route='vocabulary.index' %}</li>
+  <li class="active">{% link_for _('Categories'), named_route='vocabulary.index' %}</li>
   <li class="active">{% link_for vocab.name, named_route='vocabulary.read', id=vocab.id %}</li>
 {% endblock %}
 

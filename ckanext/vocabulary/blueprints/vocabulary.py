@@ -110,10 +110,20 @@ def new_tags(id):
     if request.method == "POST":
         params = clean_dict(
                 dict_fns.unflatten(tuplize_dict(parse_params(request.form))))
-        tags = params["tag_string"].split(",")
-        tags = [{'name': tag.strip(), 'vocabulary_id': id } for tag in tags]
-        for tag in tags:
-            get_action('tag_create')(context, tag)
+        ar_tags = params['ar']
+        en_tags = params['en']
+
+        if ar_tags and en_tags:
+            ztags = zip(en_tags, ar_tags)
+            tags = []
+            for tag in ztags:
+                tag_dict = {}
+                tag_dict['name'] = tag[0]
+                tag_dict['name_translated-en'] = tag[0]
+                tag_dict['name_translated-ar'] = tag[1]
+                tag_dict['vocabulary_id'] = id
+                get_action('tag_create')(context, tag_dict)
+
         return h.redirect_to(h.url_for('vocabulary_read', id=id))
     try:
         vocab = get_action('vocabulary_show')(context, {'id': id})['name']

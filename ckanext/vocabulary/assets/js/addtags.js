@@ -15,5 +15,21 @@ $(document).ready(()=> {
       </div>
       `
     )
+    let htmlLength = $('#tags .form-row').toArray().length
+    
+    if (htmlLength > 2) {
+      $('#rtag').show()
+    }
+    
+  })
+
+  $('#rtag').click((e) => {
+    let html = $('#tags .form-row').toArray()
+    html = html.slice(0, html.length -1)
+    $('#tags').html(html)
+
+    if( html.length <=2 ) {
+      $('#rtag').hide()
+    }
   })
 })
