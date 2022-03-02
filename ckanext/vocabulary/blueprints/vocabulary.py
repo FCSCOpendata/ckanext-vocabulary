@@ -48,9 +48,7 @@ def new():
 
         ar_tags = params['ar']
         en_tags = params['en']
-        log.debug("tags")
-        log.debug(params)
-        log.debug(en_tags)
+        
         if (ar_tags and en_tags) and (type(ar_tags) is list) :
             ztags = zip(en_tags, ar_tags)
             tags = []
