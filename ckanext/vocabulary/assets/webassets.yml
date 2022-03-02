@@ -1,0 +1,8 @@
+addtags_js:
+  output: vocab/%(version)s_addtags.js
+  extra:
+    preload:
+      - vendor/jquery
+      - vendor/bootstrap
+  contents:
+    - js/addtags.js

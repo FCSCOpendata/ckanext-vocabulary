@@ -3,26 +3,38 @@
 {% extends "page.html" %}
 
 {% block breadcrumb_content %}
-  <li class="active">{% link_for _('Vocabularies'), named_route='vocabulary.index' %}</li>
-  <li class="active">{% link_for vocab.name, named_route='vocabulary.read', id=vocab.name %}</li>
-  <li class="active">{% link_for _('Edit'), named_route='vocabulary.edit', id=vocab.name %}</li>
+<li class="active">{% link_for _('Categories'), named_route='vocabulary.index' %}</li>
+<li class="active">{% link_for vocab.name, named_route='vocabulary.read', id=vocab.name %}</li>
+<li class="active">{% link_for _('Edit'), named_route='vocabulary.edit', id=vocab.name %}</li>
 {% endblock %}
 
 
 {% block primary_content_inner %}
-  <form  method="post" data-module="basic-form">
+<form method="post" data-module="basic-form">
+  <div class="form-group">
+    {{ form.input('vocabulary', label =_('Category EN'), value=vocab.name)}}
+  </div>
+  {% if vocab.get("name_translated", False) %}
     <div class="form-group">
-      {{ form.input('vocabulary', label =_('Vocabulary'), value=vocab.name)}}
+      {{ form.input('vocabulary-ar', label =_('Category AR'), value=vocab.name_translated.ar)}}
     </div>
-    
-    <div class="form-actions">
-      {% block delete_button %}
-        {% if h.check_access('vocabulary_delete', {'id': vocab.id})  %}
-          {% set locale = h.dump_json({'content': _('Are you sure you want to delete this Vocabulary and all its Tags?')}) %}
-          <a class="btn btn-danger pull-left" href="{{h.url_for('vocabulary.delete', id=vocab.id)}}" data-module="confirm-action" data-module-i18n="{{ locale }}">{% block delete_button_text %}{{ _('Delete') }}{% endblock %}</a>
-        {% endif %}
-      {% endblock %}
-      <button type="submit" class="btn btn-primary" name="save">{{ _('save') }}</button>
+  {% else %}
+    <div class="form-group">
+      {{ form.input('vocabulary-ar', label =_('Category AR'))}}
     </div>
-  </form>
+  {% endif %}
+
+
+  <div class="form-actions">
+    {% block delete_button %}
+    {% if h.check_access('vocabulary_delete', {'id': vocab.id}) %}
+    {% set locale = h.dump_json({'content': _('Are you sure you want to delete this Category and all its Tags?')}) %}
+    <a class="btn btn-danger pull-left" href="{{h.url_for('vocabulary.delete', id=vocab.id)}}"
+      data-module="confirm-action" data-module-i18n="{{ locale }}">{% block delete_button_text %}{{ _('Delete') }}{%
+      endblock %}</a>
+    {% endif %}
+    {% endblock %}
+    <button type="submit" class="btn btn-primary" name="save">{{ _('save') }}</button>
+  </div>
+</form>
 {% endblock %}
