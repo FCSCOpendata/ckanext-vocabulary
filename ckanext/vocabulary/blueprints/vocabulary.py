@@ -48,8 +48,10 @@ def new():
 
         ar_tags = params['ar']
         en_tags = params['en']
-
-        if ar_tags and en_tags:
+        log.debug("tags")
+        log.debug(params)
+        log.debug(en_tags)
+        if (ar_tags and en_tags) and (type(ar_tags) is list) :
             ztags = zip(en_tags, ar_tags)
             tags = []
             for tag in ztags:
@@ -58,7 +60,12 @@ def new():
                 tag_dict['name_translated-en'] = tag[0]
                 tag_dict['name_translated-ar'] = tag[1]
                 tags.append(tag_dict)
-
+        else:
+            tags = [{
+                'name': en_tags,
+                'name_translated-en': en_tags,
+                'name_translated-ar': ar_tags
+            }]
         data_dict['tags'] = tags
         create_vocab = get_action('vocabulary_create')(context, data_dict)
         return h.redirect_to(h.url_for('vocabulary_read', id=params['vocabulary']))
@@ -109,7 +116,7 @@ def new_tags(id):
         ar_tags = params['ar']
         en_tags = params['en']
 
-        if ar_tags and en_tags:
+        if (ar_tags and en_tags) and (type(ar_tags) is list):
             ztags = zip(en_tags, ar_tags)
             tags = []
             for tag in ztags:
@@ -119,6 +126,14 @@ def new_tags(id):
                 tag_dict['name_translated-ar'] = tag[1]
                 tag_dict['vocabulary_id'] = id
                 get_action('tag_create')(context, tag_dict)
+        else:
+            tag_dict = {
+                'name': en_tags,
+                'name_translated-en': en_tags,
+                'name_translated-ar': ar_tags,
+                'vocabulary_id': id
+            }
+            get_action('tag_create')(context, tag_dict)
 
         return h.redirect_to(h.url_for('vocabulary_read', id=id))
     try:
