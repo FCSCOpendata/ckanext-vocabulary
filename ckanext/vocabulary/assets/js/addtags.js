@@ -18,7 +18,7 @@ $(document).ready(()=> {
     let htmlLength = $('#tags .form-row').toArray().length
     
     if (htmlLength > 2) {
-      $('#rtag').show()
+      $('#rtag').css('visibility', 'visible');
     }
     
   })
@@ -29,7 +29,7 @@ $(document).ready(()=> {
     $('#tags').html(html)
 
     if( html.length <=2 ) {
-      $('#rtag').hide()
+      $('#rtag').css('visibility', 'hidden');
     }
   })
 })

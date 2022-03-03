@@ -65,8 +65,12 @@ def new():
                 'name_translated-ar': ar_tags
             }]
         data_dict['tags'] = tags
-        create_vocab = get_action('vocabulary_create')(context, data_dict)
-        return h.redirect_to(h.url_for('vocabulary_read', id=params['vocabulary']))
+        try:
+            create_vocab = get_action('vocabulary_create')(context, data_dict)
+            h.flash_success(u"Successfully create category.")
+            return h.redirect_to(h.url_for('vocabulary_read', id=params['vocabulary']))
+        except logic.ValidationError as e:
+            h.flash_error(e.error_dict)
 
     return render('vocabulary/new.html', {})
 
@@ -95,9 +99,13 @@ def edit(id):
         params = clean_dict(
                 dict_fns.unflatten(tuplize_dict(parse_params(request.form))))
         
-        get_action('vocabulary_update')(context, {'id': id, "name": params['vocabulary']})
-        return h.redirect_to(h.url_for('vocabulary_read', id=id))
-
+        try:
+            get_action('vocabulary_update')(context, {'id': id, "name": params['vocabulary']})
+            h.flash_success(u"Succesfully edit category.")
+            return h.redirect_to(h.url_for('vocabulary_read', id=id))
+        except logic.ValidationError as e:
+            h.flash_error(e.error_dict)
+    
     vocab = get_action('vocabulary_show')(context, {'id': id})
     return render('vocabulary/edit.html', {"vocab": vocab})
 
@@ -116,7 +124,6 @@ def new_tags(id):
 
         if (ar_tags and en_tags) and (type(ar_tags) is list):
             ztags = zip(en_tags, ar_tags)
-            tags = []
             for tag in ztags:
                 tag_dict = {}
                 tag_dict['name'] = tag[0]
@@ -131,9 +138,13 @@ def new_tags(id):
                 'name_translated-ar': ar_tags,
                 'vocabulary_id': id
             }
-            get_action('tag_create')(context, tag_dict)
+            try:
+                get_action('tag_create')(context, tag_dict)
+                h.flash_success(u"Tag sucessfully added to the category.")
+                return h.redirect_to(h.url_for('vocabulary_read', id=id))
+            except logic.ValidationError as e:
+                h.flash_error(e.error_dict)
 
-        return h.redirect_to(h.url_for('vocabulary_read', id=id))
     try:
         vocab = get_action('vocabulary_show')(context, {'id': id})['name']
     except NotFound:
@@ -152,12 +163,8 @@ def delete_tags(vocab_id, id):
         params = clean_dict(
                 dict_fns.unflatten(tuplize_dict(parse_params(request.form))))
         
-        if "delete" in params:
-            get_action('tag_delete')(context, {'id': id, 'vocabulary_id': vocab_id})
-            return h.redirect_to(h.url_for('vocabulary_read', id=vocab_id))
-        else:
-            get_action('tag_update')(context, {'id': id, "name": params['tag'], 'vocabulary_id': vocab_id})
-            return h.redirect_to(h.url_for('vocabulary_read', id=id))
+        get_action('tag_delete')(context, {'id': id, 'vocabulary_id': vocab_id})
+        return h.redirect_to(h.url_for('vocabulary_read', id=vocab_id))
 
     tag = get_action('tag_show')(context, {'id': id})
     vocab_name = get_action('vocabulary_show')(context, {'id': vocab_id})['name']
