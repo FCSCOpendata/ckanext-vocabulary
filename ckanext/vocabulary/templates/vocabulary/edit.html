@@ -8,20 +8,27 @@
 <li class="active">{% link_for _('Edit'), named_route='vocabulary.edit', id=vocab.name %}</li>
 {% endblock %}
 
+{% block page_header %}
+<h1 class="module-content page-header">{{ _('Edit Category') }}</h1>
+{% endblock %}
 
 {% block primary_content_inner %}
+{% set flash_messages = h.flash.pop_messages() %}
+    {{ h.literal(message) }}
 <form method="post" data-module="basic-form">
   <div class="form-group">
-    {{ form.input('vocabulary', label =_('Category EN'), value=vocab.name)}}
+    {{ form.input('vocabulary', label =_('EN NAME'), value=vocab.name)}}
   </div>
   {% if vocab.get("name_translated", False) %}
     <div class="form-group">
-      {{ form.input('vocabulary-ar', label =_('Category AR'), value=vocab.name_translated.ar)}}
+      <label>AR NAME</label>
+      <input type="text" name="vocabulary-ar" class="form-control" dir="rtl" value="{{vocab.name_translated.ar}}">
     </div>
   {% else %}
-    <div class="form-group">
-      {{ form.input('vocabulary-ar', label =_('Category AR'))}}
-    </div>
+  <div class="form-group">
+    <label>AR NAME</label>
+    <input type="text" name="vocabulary-ar" class="form-control" dir="rtl">
+  </div>
   {% endif %}
 
 
@@ -37,4 +44,7 @@
     <button type="submit" class="btn btn-primary" name="save">{{ _('save') }}</button>
   </div>
 </form>
+{% endblock %}
+{% block secondary_content %}
+  {% snippet "vocabulary/snippets/helper.html" %}
 {% endblock %}

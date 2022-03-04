@@ -8,8 +8,13 @@
 <li class="active">{% link_for _('Delete Tag'), named_route='vocabulary.delete_tags', vocab_id=vocab_name, id = tag.id %}</li>
 {% endblock %}
 
+{% block page_header %}
+<h1 class="module-content page-header">{{ _('Delete Tag') }}</h1>
+{% endblock %}
 
 {% block primary_content_inner %}
+{% set flash_messages = h.flash.pop_messages() %}
+    {{ h.literal(message) }}
   <form  method="post" data-module="basic-form">
     {% if tag.get("name_translated", False) %}
     <p>Will you like to delete Tag EN: <b>{{ tag.name }}</b> and Tag AR: <b>{{ tag.name_translated.ar }}</b>  from Category: <b>{{ vocab_name }}</b></p>
@@ -20,4 +25,7 @@
       <button type="submit" class="btn btn-danger" name="delete">{{ _('delete') }}</button>
     </div>
   </form>
+{% endblock %}
+{% block secondary_content %}
+  {% snippet "vocabulary/snippets/helper.html" %}
 {% endblock %}

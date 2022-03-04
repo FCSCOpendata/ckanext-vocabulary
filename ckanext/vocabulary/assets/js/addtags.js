@@ -17,8 +17,8 @@ $(document).ready(()=> {
     )
     let htmlLength = $('#tags .form-row').toArray().length
     
-    if (htmlLength > 2) {
-      $('#rtag').show()
+    if (htmlLength > 1) {
+      $('#rtag').css('visibility', 'visible');
     }
     
   })
@@ -28,8 +28,8 @@ $(document).ready(()=> {
     html = html.slice(0, html.length -1)
     $('#tags').html(html)
 
-    if( html.length <=2 ) {
-      $('#rtag').hide()
+    if( html.length <=1 ) {
+      $('#rtag').css('visibility', 'hidden');
     }
   })
 })

@@ -8,37 +8,38 @@
   <li class="active">{% link_for _('Tags'), named_route='vocabulary.new_tags', id=vocab_name %}</li>
 {% endblock %}
 
+{% block page_header %}
+<h1 class="module-content page-header">{{ _('Add Tags') }}</h1>
+{% endblock %}
 {% block primary_content_inner %}
-  <form class="dataset-form" method="post" data-module="basic-form">
+    {% set flash_messages = h.flash.pop_messages() %}
+    {{ h.literal(message) }}
+  <form  method="post" data-module="basic-form">
     <div class="form-group">
-      <p>Tags:</p>
-    </div>
-    
-    <div class="form-group" id="tags">
-      <div class="form-row">
-        <div class="form-group col-md-6">
-          <label >EN</label>
-        </div>
-        <div class="form-group col-md-6">
-          <label >AR</label>
-        </div>
-      </div>
-      <div class="form-row">
-        <div class="form-group col-md-6">
-          <input type="text" name="en" class="form-control" >
-        </div>
-        <div class="form-group col-md-6">
-          <input type="text" name="ar" class="form-control" required>
+      <div class="form-group" id="tags">
+        <div class="form-row" >
+          <div class="form-group col-md-6">
+            <label >EN Name</label>
+            <input type="text" name="en" class="form-control" >
+          </div>
+          <div class="form-group col-md-6">
+            <label >AR Name</label>
+            <input type="text" name="ar" class="form-control" dir="rtl">
+          </div>
         </div>
       </div>
+      <div class="form-group" style="margin-left: 15px;">
+        <button type="button" class="btn btn-default pull-left" id="adtag">{{ _('add tags') }}</button>
+        <button type="button" class="btn btn-danger" style="margin-left: 8%;visibility:hidden" id="rtag">{{ _('remove tags') }}</button>
+      </div>
     </div>
-
-    <div class="form-groups">
-      <button type="button" class="btn btn-success pull-left" id="adtag">{{ _('add tags') }}</button>
-      <button type="button" class="btn btn-danger" style="margin-left: 8%;display: none;" id="rtag">{{ _('remove tags') }}</button>
+    <div class="form-group">
       <button type="submit" class="btn btn-primary pull-right" name="save">{{ _('save') }}</button>
     </div>
   </form>
+{% endblock %}
+{% block secondary_content %}
+  {% snippet "vocabulary/snippets/helper.html" %}
 {% endblock %}
 {% block scripts %}
   {% asset 'vocab/addtags_js' %}
