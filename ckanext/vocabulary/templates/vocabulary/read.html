@@ -1,6 +1,6 @@
 {% extends "page.html" %}
 
-{% block subtitle %}{{ _('Category') }}{% endblock %}
+{% block subtitle %}{{ vocab.name }} {{ g.template_title_delimiter }}{{ _('Category') }}{% endblock %}
 
 {% block breadcrumb_content %}
   <li class="active">{% link_for _('Categories'), named_route='vocabulary.index' %}</li>

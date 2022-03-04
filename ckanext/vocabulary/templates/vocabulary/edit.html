@@ -1,7 +1,7 @@
 {% import 'macros/form.html' as form %}
 
 {% extends "page.html" %}
-{% block subtitle %}{{ _('Edit Category') }}{% endblock %}
+{% block subtitle %}{{ vocab.name }} {{ g.template_title_delimiter }}{{ _('Edit Category') }}{% endblock %}
 {% block breadcrumb_content %}
 <li class="active">{% link_for _('Categories'), named_route='vocabulary.index' %}</li>
 <li class="active">{% link_for vocab.name, named_route='vocabulary.read', id=vocab.name %}</li>
