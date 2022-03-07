@@ -54,13 +54,13 @@ def new():
             tags = []
             for tag in ztags:
                 tag_dict = {}
-                tag_dict['name'] = tag[0]
-                tag_dict['name_translated-en'] = tag[0]
+                tag_dict['name'] = tag[0].strip()
+                tag_dict['name_translated-en'] = tag[0].strip()
                 tag_dict['name_translated-ar'] = tag[1]
                 tags.append(tag_dict)
         else:
             tags = [{
-                'name': en_tags,
+                'name': en_tags.strip(),
                 'name_translated-en': en_tags,
                 'name_translated-ar': ar_tags
             }]
@@ -126,15 +126,15 @@ def new_tags(id):
             ztags = zip(en_tags, ar_tags)
             for tag in ztags:
                 tag_dict = {}
-                tag_dict['name'] = tag[0]
-                tag_dict['name_translated-en'] = tag[0]
+                tag_dict['name'] = tag[0].strip()
+                tag_dict['name_translated-en'] = tag[0].strip()
                 tag_dict['name_translated-ar'] = tag[1]
                 tag_dict['vocabulary_id'] = id
                 get_action('tag_create')(context, tag_dict)
         else:
             tag_dict = {
-                'name': en_tags,
-                'name_translated-en': en_tags,
+                'name': en_tags.strip(),
+                'name_translated-en': en_tags.strip(),
                 'name_translated-ar': ar_tags,
                 'vocabulary_id': id
             }
