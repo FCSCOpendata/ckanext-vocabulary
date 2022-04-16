@@ -15,13 +15,13 @@
     {% set flash_messages = h.flash.pop_messages() %}
     {{ h.literal(message) }}
   <form class="dataset-form" method="post" data-module="basic-form">
-    <div class="form-group">
-      {{ form.input('vocabulary', label =_('EN Name'))}}
-    </div>
-    <div class="form-group">
-      <label>AR NAME</label>
-      <input type="text" name="vocabulary-ar" class="form-control" dir="rtl">
-    </div>
+    {{ form.input('vocabulary', label =_('EN NAME'), value=data.name, error=errors.name)}}
+    {{ form.input('vocabulary-ar', label =_('AR NAME'), value=data.name_translated.ar if data.name_translated else  '' )}}
+    {{ form.markdown('description-en', id='description-en', label=_('EN Description'), 
+        value= data.description_translated.en if data.description_translated else  '' )}}
+    {{ form.markdown('description-ar', id='description-ar', label=_('AR Description'), 
+        value=data.description_translated.ar if data.description_translated else '', attrs={'dir': 'rtl'} )}}
+  
 
     <div class="form-group" >
       <h2 class="page-header" style="color:#2f88a3;">{{ _('Add Tags') }}</h2>

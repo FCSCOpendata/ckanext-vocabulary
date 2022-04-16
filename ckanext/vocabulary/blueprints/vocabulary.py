@@ -37,14 +37,20 @@ def new():
                 'user': c.user, 'auth_user_obj': c.userobj}
     if not c.userobj.sysadmin:
         base.abort(403, _(u'Unauthorized to create a group'))
+    
+    data_dict = {}
+    errors = {}
+    error_summary = {}
 
     if request.method == 'POST':
         params = clean_dict(
                 dict_fns.unflatten(tuplize_dict(parse_params(request.form))))
-        data_dict = {}
+       
         data_dict['name'] = params['vocabulary']
         data_dict["name_translated-en"] = params['vocabulary']
         data_dict["name_translated-ar"] = params['vocabulary-ar']
+        data_dict["description_translated-en"] = params['description-en']
+        data_dict["description_translated-ar"] = params['description-ar']
 
         ar_tags = params['ar']
         en_tags = params['en']
@@ -64,15 +70,25 @@ def new():
                 'name_translated-en': en_tags,
                 'name_translated-ar': ar_tags
             }]
-        data_dict['tags'] = tags
+        
+        # Only add tags in dict if tag is provided in request params.    
+        if en_tags:
+            data_dict['tags'] = tags
+
         try:
             create_vocab = get_action('vocabulary_create')(context, data_dict)
             h.flash_success(u"Successfully create category.")
             return h.redirect_to(h.url_for('vocabulary_read', id=params['vocabulary']))
         except logic.ValidationError as e:
-            h.flash_error(e.error_dict)
+            errors=e.error_dict
 
-    return render('vocabulary/new.html', {})
+    vars = {
+        'data': data_dict or {}, 
+        'errors': errors or {}, 
+        'error_summary': error_summary or {}
+        }
+    return render('vocabulary/new.html',  extra_vars=vars)
+
 
 
 def read(id):
@@ -99,15 +115,26 @@ def edit(id):
         params = clean_dict(
                 dict_fns.unflatten(tuplize_dict(parse_params(request.form))))
         
+        data_dict = { "id": id}
+        data_dict['name'] = params['vocabulary']
+        data_dict['name_translated-en'] = params['vocabulary']
+        data_dict['name_translated-ar'] = params['vocabulary-ar']
+        data_dict['description_translated-en'] = params['description-en']
+        data_dict['description_translated-ar'] = params['description-ar']
+        data_dict['id'] = id
+        
         try:
-            get_action('vocabulary_update')(context, {'id': id, "name": params['vocabulary']})
+            get_action('vocabulary_update')(context, data_dict)
             h.flash_success(u"Succesfully edit category.")
             return h.redirect_to(h.url_for('vocabulary_read', id=id))
         except logic.ValidationError as e:
             h.flash_error(e.error_dict)
-    
     vocab = get_action('vocabulary_show')(context, {'id': id})
-    return render('vocabulary/edit.html', {"vocab": vocab})
+    errors = {}
+    error_summary = {}
+    vars = {'data': vocab, 'errors': errors}
+
+    return render('vocabulary/edit.html',  extra_vars=vars)
 
 
 def new_tags(id):
