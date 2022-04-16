@@ -45,12 +45,19 @@ def new():
     if request.method == 'POST':
         params = clean_dict(
                 dict_fns.unflatten(tuplize_dict(parse_params(request.form))))
-       
+        params.update(clean_dict(
+            dict_fns.unflatten(tuplize_dict(parse_params(request.files)))
+        ))           
         data_dict['name'] = params['vocabulary']
         data_dict["name_translated-en"] = params['vocabulary']
         data_dict["name_translated-ar"] = params['vocabulary-ar']
         data_dict["description_translated-en"] = params['description-en']
         data_dict["description_translated-ar"] = params['description-ar']
+
+        if params['image_upload']:
+            data_dict.update({'image_url': params['image_url'], 'image_upload': params['image_upload']})
+        if params['icon_upload']:
+            data_dict.update({'icon_url': params['icon_upload'], 'icon_upload': params['icon_upload']})
 
         ar_tags = params['ar']
         en_tags = params['en']
@@ -114,6 +121,9 @@ def edit(id):
     if request.method == "POST":
         params = clean_dict(
                 dict_fns.unflatten(tuplize_dict(parse_params(request.form))))
+        params.update(clean_dict(
+            dict_fns.unflatten(tuplize_dict(parse_params(request.files)))
+        ))       
         
         data_dict = { "id": id}
         data_dict['name'] = params['vocabulary']
@@ -123,6 +133,16 @@ def edit(id):
         data_dict['description_translated-ar'] = params['description-ar']
         data_dict['id'] = id
         
+        if params['image_upload']:
+            data_dict.update({'image_upload': params['image_upload']})
+        if params['icon_upload']:
+            data_dict.update({'icon_upload': params['icon_upload']})
+            
+        if params['image_url']:
+            data_dict.update({'image_url': params['image_url']})
+        if params['icon_url']:
+            data_dict.update({'icon_url': params['icon_url']})
+
         try:
             get_action('vocabulary_update')(context, data_dict)
             h.flash_success(u"Succesfully edit category.")
