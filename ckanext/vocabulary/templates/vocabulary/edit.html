@@ -1,11 +1,11 @@
 {% import 'macros/form.html' as form %}
 
 {% extends "page.html" %}
-{% block subtitle %}{{ vocab.name }} {{ g.template_title_delimiter }}{{ _('Edit Category') }}{% endblock %}
+{% block subtitle %}{{ data.name }} {{ g.template_title_delimiter }}{{ _('Edit Category') }}{% endblock %}
 {% block breadcrumb_content %}
 <li class="active">{% link_for _('Categories'), named_route='vocabulary.index' %}</li>
-<li class="active">{% link_for vocab.name, named_route='vocabulary.read', id=vocab.name %}</li>
-<li class="active">{% link_for _('Edit'), named_route='vocabulary.edit', id=vocab.name %}</li>
+<li class="active">{% link_for data.name, named_route='vocabulary.read', id=data.name %}</li>
+<li class="active">{% link_for _('Edit'), named_route='vocabulary.edit', id=data.name %}</li>
 {% endblock %}
 
 {% block page_header %}
@@ -15,28 +15,29 @@
 {% block primary_content_inner %}
 {% set flash_messages = h.flash.pop_messages() %}
     {{ h.literal(message) }}
-<form method="post" data-module="basic-form">
-  <div class="form-group">
-    {{ form.input('vocabulary', label =_('EN NAME'), value=vocab.name)}}
-  </div>
-  {% if vocab.get("name_translated", False) %}
-    <div class="form-group">
-      <label>AR NAME</label>
-      <input type="text" name="vocabulary-ar" class="form-control" dir="rtl" value="{{vocab.name_translated.ar}}">
-    </div>
-  {% else %}
-  <div class="form-group">
-    <label>AR NAME</label>
-    <input type="text" name="vocabulary-ar" class="form-control" dir="rtl">
-  </div>
-  {% endif %}
+<form method="post" data-module="basic-form" enctype="multipart/form-data">
 
+  {{ form.input('vocabulary', label =_('EN NAME'), value=data.name)}}
+  {{ form.input('vocabulary-ar', label =_('AR NAME'), value=data.name_translated.ar if data.name_translated else  '' )}}
+  {{ form.markdown('description-en', id='description-en', label=_('EN Description'), 
+      value= data.description_translated.en if data.description_translated else  '' )}}
+  {{ form.markdown('description-ar', id='description-ar', label=_('AR Description'), 
+      value=data.description_translated.ar if data.description_translated else '', attrs={'dir': 'rtl'} )}}
+
+  {% set is_image_upload = data.image_url and not data.image_url.startswith('http') %}
+  {% set is_image_url = data.image_url and data.image_url.startswith('http') %}
+  {{ form.image_upload(data, errors, is_upload_enabled=h.uploads_enabled(), is_url=is_image_url, is_upload=is_image_upload) }}
+
+  {% set is_icon_upload = data.icon_url and not data.icon_url.startswith('http') %}
+  {% set is_icon_url = data.icon_url and data.icon_url.startswith('http') %}
+  {{ form.image_upload(data, errors, is_upload_enabled=h.uploads_enabled(), field_upload='icon_upload',
+  field_url='icon_url', upload_label='Icon', url_label='Icon', is_url=is_icon_url, is_upload=is_icon_upload, ) }}
 
   <div class="form-actions">
     {% block delete_button %}
-    {% if h.check_access('vocabulary_delete', {'id': vocab.id}) %}
+    {% if h.check_access('vocabulary_delete', {'id': data.id}) %}
     {% set locale = h.dump_json({'content': _('Are you sure you want to delete this Category and all its Tags?')}) %}
-    <a class="btn btn-danger pull-left" href="{{h.url_for('vocabulary.delete', id=vocab.id)}}"
+    <a class="btn btn-danger pull-left" href="{{h.url_for('vocabulary.delete', id=data.id)}}"
       data-module="confirm-action" data-module-i18n="{{ locale }}">{% block delete_button_text %}{{ _('Delete') }}{%
       endblock %}</a>
     {% endif %}
@@ -47,4 +48,10 @@
 {% endblock %}
 {% block secondary_content %}
   {% snippet "vocabulary/snippets/helper.html" %}
+{% endblock %}
+
+{% block scripts %}
+   {{super()}}
+  {% asset 'ckanext-scheming/upload_js' %}
+  {% asset 'vocab/addtags_js' %}
 {% endblock %}
