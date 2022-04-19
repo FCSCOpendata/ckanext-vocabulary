@@ -38,5 +38,20 @@
   </div>
 {% endblock %}
 {% block secondary_content %}
-  {% snippet "vocabulary/snippets/helper.html" %}
+<section class="context-info">
+  {% block image %}
+  <div class="image">
+    {% if vocab.image_display_url %}
+      <img src="{{ vocab.image_display_url or h.url_for_static('/base/images/placeholder-organization.png') }}"
+        width="200" alt="{{ vocab.name }}" />
+    {% endif %}
+  </div>
+  <div class="icon">
+    {% if vocab.icon_display_url %}
+    <img src="{{ vocab.icon_display_url }}" width="50" height="50" alt="{{ vocab.name }}" />
+    {% endif %}
+  </div>
+  {% endblock %}
+</section>
+{% snippet "vocabulary/snippets/helper.html" %}
 {% endblock %}
