@@ -8,11 +8,22 @@
 {% endblock %}
 
 {% block page_header %}
-<h1 class="module-content">{{vocab.name}}</h1>
-{% endblock %}
+  <div class="module-content">
+    <h1>{{ h.scheming_language_text(vocab.name_translated)}} </h1>
+    {% block description %}
+      {% if vocab.description_translated %}
+      <p class="description">
+        {{ h.render_markdown(h.scheming_language_text(vocab.description_translated)) }}
+        </p>
+        {% else %}
+          <p class="empty">{{ _('There is no description for this vocabulary') }}</p>
+        {% endif %}
+      {% endblock %}
+  </div>
+  {% endblock %}
 
 {% block primary_content_inner %}
-  <header class="page-header collection-header">
+  <header class="page-header collection-header" style="margin-top: 0;">
     <span><b>{{ _('Tags') }}</b></span>
     <span style="float: right;">
       {% if h.check_access('vocabulary_create') %}
