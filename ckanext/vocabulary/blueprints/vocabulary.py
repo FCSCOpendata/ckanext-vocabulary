@@ -168,16 +168,39 @@ def new_tags(id):
                 dict_fns.unflatten(tuplize_dict(parse_params(request.form))))
         ar_tags = params['ar']
         en_tags = params['en']
+        free_tags = get_action('tag_list')(context, {})
+        non_free_tags = []
+
+        for vocab in get_action('vocabulary_list')(context, {}):
+            if vocab.get('id') != id:
+                for tag in vocab.get('tags'):
+                    non_free_tags.append(tag.get('name'))
 
         if (ar_tags and en_tags) and (type(ar_tags) is list):
             ztags = zip(en_tags, ar_tags)
+            error_tags = 0
             for tag in ztags:
                 tag_dict = {}
                 tag_dict['name'] = tag[0].strip()
                 tag_dict['name_translated-en'] = tag[0].strip()
                 tag_dict['name_translated-ar'] = tag[1]
                 tag_dict['vocabulary_id'] = id
-                get_action('tag_create')(context, tag_dict)
+
+                try:
+                    if tag[0].strip() in free_tags or tag[0].strip() in non_free_tags:
+                        error_tags +=1
+                        raise logic.ValidationError(
+                            error_dict= {'name_translated-en': [f'Tag {tag[0].strip()}  already exist']}
+                        )
+                    else:
+                        get_action('tag_create')(context, tag_dict)
+                except logic.ValidationError:
+                    h.flash_error(f'{tag[0].strip()} already exist')
+            
+            if not error_tags:
+                h.flash_success(f"Tags sucessfully added to the category.")
+                return h.redirect_to(h.url_for('vocabulary_read', id=id))
+
         else:
             tag_dict = {
                 'name': en_tags.strip(),
@@ -186,9 +209,14 @@ def new_tags(id):
                 'vocabulary_id': id
             }
             try:
-                get_action('tag_create')(context, tag_dict)
-                h.flash_success(u"Tag sucessfully added to the category.")
-                return h.redirect_to(h.url_for('vocabulary_read', id=id))
+                if en_tags.strip() in free_tags or en_tags.strip() in non_free_tags:
+                    raise logic.ValidationError(
+                        error_dict= {'name_translated-en': [f'Tag {en_tags.strip()}  already exist']}
+                    )
+                else:
+                    get_action('tag_create')(context, tag_dict)
+                    h.flash_success(u"Tag sucessfully added to the category.")
+                    return h.redirect_to(h.url_for('vocabulary_read', id=id))
             except logic.ValidationError as e:
                 h.flash_error(e.error_dict)
 
