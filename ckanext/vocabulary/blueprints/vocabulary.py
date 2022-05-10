@@ -207,7 +207,7 @@ def new_tags(id):
                         error_tags +=1
                         tagname = non_free_tags[en_tag]
                         raise logic.ValidationError(
-                            error_dict= {'name_translated-en': [f'Tag: "{tag[0].strip()}"  already exist in Tag: "{tagname}"']}
+                            error_dict= {'name_translated-en': [f'Tag: "{tag[0].strip()}"  already exist in Category: "{tagname}"']}
                         )
                     elif ar_tag in non_free_tag_key:
                         error_tags +=1
