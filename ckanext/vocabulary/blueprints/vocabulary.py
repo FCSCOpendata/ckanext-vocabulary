@@ -172,18 +172,17 @@ def new_tags(id):
         non_free_tags = {}
         non_free_tags_ar = {}
         for vocab in get_action('vocabulary_list')(context, {}):
-            if vocab.get('id') != id:
-                for tag in vocab.get('tags'):
-                    tag_name = tag.get('name').lower()
-                    tag_item = get_action('tag_show')(context, {'id': tag.get('id')})
-                    non_free_tags[tag_name] = vocab.get('name')
-                    if 'name_translated' in tag_item:
-                        tag_ar = tag_item.get('name_translated').get('ar').lower().strip()
-                        if tag_ar:
-                            non_free_tags_ar[tag_ar] = {
-                                'vocab':vocab.get('name'),
-                                'tag': tag_name
-                            }
+            for tag in vocab.get('tags'):
+                tag_name = tag.get('name').lower()
+                tag_item = get_action('tag_show')(context, {'id': tag.get('id')})
+                non_free_tags[tag_name] = vocab.get('name')
+                if 'name_translated' in tag_item:
+                    tag_ar = tag_item.get('name_translated').get('ar').lower().strip()
+                    if tag_ar:
+                        non_free_tags_ar[tag_ar] = {
+                            'vocab':vocab.get('name'),
+                            'tag': tag_name
+                        }
         non_free_tag_key = list(non_free_tags.keys())
         non_free_tag_key_ar = list(non_free_tags_ar.keys())
         if (ar_tags and en_tags) and (type(ar_tags) is list):
