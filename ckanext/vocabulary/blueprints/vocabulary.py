@@ -168,13 +168,21 @@ def new_tags(id):
                 dict_fns.unflatten(tuplize_dict(parse_params(request.form))))
         ar_tags = params['ar']
         en_tags = params['en']
-        free_tags = get_action('tag_list')(context, {})
-        non_free_tags = []
+        free_tags = [x.lower() for x in get_action('tag_list')(context, {})]
+        non_free_tags = {}
 
         for vocab in get_action('vocabulary_list')(context, {}):
             if vocab.get('id') != id:
                 for tag in vocab.get('tags'):
-                    non_free_tags.append(tag.get('name'))
+                    tag_name = tag.get('name').lower()
+                    tag_item = get_action('tag_show')(context, {'id': tag.get('id')})
+                    tag_ar = tag_item.get('name_translated').get('ar').lower().strip()
+                    non_free_tags[tag_name] = vocab.get('name')
+                    if tag_ar:
+                        non_free_tags[tag_ar] = {
+                            'vocab':vocab.get('name'),
+                            'tag': tag_name
+                        }
 
         if (ar_tags and en_tags) and (type(ar_tags) is list):
             ztags = zip(en_tags, ar_tags)
@@ -183,19 +191,38 @@ def new_tags(id):
                 tag_dict = {}
                 tag_dict['name'] = tag[0].strip()
                 tag_dict['name_translated-en'] = tag[0].strip()
-                tag_dict['name_translated-ar'] = tag[1]
+                tag_dict['name_translated-ar'] = tag[1].strip()
                 tag_dict['vocabulary_id'] = id
 
+                non_free_tag_key = list(non_free_tags.keys())
+                en_tag = tag[0].lower().strip()
+                ar_tag = tag[1].lower().strip()
                 try:
-                    if tag[0].strip() in free_tags or tag[0].strip() in non_free_tags:
+                    if tag[0].lower().strip() in free_tags:
                         error_tags +=1
                         raise logic.ValidationError(
-                            error_dict= {'name_translated-en': [f'Tag {tag[0].strip()}  already exist']}
+                            error_dict= {'name_translated-en': [f'Tag: "{tag[0].strip()}"  already exist in Free Tags']}
+                        )
+                    elif en_tag in non_free_tag_key:
+                        error_tags +=1
+                        tagname = non_free_tags[en_tag]
+                        raise logic.ValidationError(
+                            error_dict= {'name_translated-en': [f'Tag: "{tag[0].strip()}"  already exist in Category: "{tagname}"']}
+                        )
+                    elif ar_tag in non_free_tag_key:
+                        error_tags +=1
+                        tagname = non_free_tags[ar_tag]
+                        vocab_name = tagname['vocab']
+                        trans_name = tagname['tag']
+                        raise logic.ValidationError(
+                            error_dict= {
+                                'name_translated-en': [f'AR Tag "{tag[0].strip()}" already exist in Category: {vocab_name} under EN Tag: {trans_name}']
+                                }
                         )
                     else:
                         get_action('tag_create')(context, tag_dict)
-                except logic.ValidationError:
-                    h.flash_error(f'{tag[0].strip()} already exist')
+                except logic.ValidationError as e:
+                    h.flash_error(e.error_dict.get('name_translated-en')[0])
             
             if not error_tags:
                 h.flash_success(f"Tags sucessfully added to the category.")
@@ -205,20 +232,37 @@ def new_tags(id):
             tag_dict = {
                 'name': en_tags.strip(),
                 'name_translated-en': en_tags.strip(),
-                'name_translated-ar': ar_tags,
+                'name_translated-ar': ar_tags.strip(),
                 'vocabulary_id': id
             }
+            non_free_tag_key = list(non_free_tags.keys())
+            en_tag = en_tags.lower().strip()
+            ar_tag = ar_tags.lower().strip()
             try:
-                if en_tags.strip() in free_tags or en_tags.strip() in non_free_tags:
+                if en_tag.strip() in free_tags:
                     raise logic.ValidationError(
-                        error_dict= {'name_translated-en': [f'Tag {en_tags.strip()}  already exist']}
+                        error_dict= {'name_translated-en': [f'Tag: "{en_tags.strip()}"  already exist in Free Tags']}
                     )
+                elif en_tag in non_free_tag_key:
+                    tagname = non_free_tags[en_tag]
+                    raise logic.ValidationError(
+                        error_dict= {'name_translated-en': [f'Tag: "{en_tags.strip()}"  already exist in Category: "{tagname}"']}
+                    )
+                elif ar_tag in non_free_tag_key:
+                    tagname = non_free_tags[ar_tag]
+                    vocab_name = tagname['vocab']
+                    trans_name = tagname['tag']
+                    raise logic.ValidationError(
+                        error_dict= {
+                            'name_translated-en': [f'AR Tag: "{ar_tags.strip()}" already exist in Category: {vocab_name} under EN Tag: {trans_name}']
+                            }
+                    )   
                 else:
                     get_action('tag_create')(context, tag_dict)
                     h.flash_success(u"Tag sucessfully added to the category.")
                     return h.redirect_to(h.url_for('vocabulary_read', id=id))
             except logic.ValidationError as e:
-                h.flash_error(e.error_dict)
+                h.flash_error(e.error_dict.get('name_translated-en')[0])
 
     try:
         vocab = get_action('vocabulary_show')(context, {'id': id})['name']
