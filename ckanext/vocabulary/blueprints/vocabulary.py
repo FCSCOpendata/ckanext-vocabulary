@@ -168,6 +168,7 @@ def new_tags(id):
                 dict_fns.unflatten(tuplize_dict(parse_params(request.form))))
         ar_tags = params['ar']
         en_tags = params['en']
+
         if (ar_tags and en_tags) and (type(ar_tags) is list):
             ztags = zip(en_tags, ar_tags)
             for tag in ztags:
